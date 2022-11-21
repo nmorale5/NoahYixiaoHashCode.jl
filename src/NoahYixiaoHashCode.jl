@@ -9,4 +9,5 @@ module NoahYixiaoHashCode
     include("routing_problem.jl")
     include("solution.jl")
     include("solver_randwalk.jl")
+    include("solver_greedy.jl")
 end

@@ -34,4 +34,11 @@ using Test
         @test NoahYixiaoHashCode.is_feasible(s)
         @test NoahYixiaoHashCode.total_distance(s) > 1
     end
+
+    @testset "Greedy" begin
+        problem = load_problem()
+        s = NoahYixiaoHashCode.solve_greedy(problem)
+        @test NoahYixiaoHashCode.is_feasible(s)
+        @test NoahYixiaoHashCode.total_distance(s) > 1
+    end
 end
