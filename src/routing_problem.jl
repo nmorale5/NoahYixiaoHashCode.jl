@@ -1,3 +1,19 @@
+"""
+    RoutingProblem
+
+Store the information of a routing problem.
+
+# Fields
+- `n_junctions::Int`: number of junctions
+- `n_cars::Int`: number of cars
+- `n_streets::Int`: number of streets
+- `total_time::Int`: time limit
+- `init_j::Int`: id of the initial junction
+- `junctions::J`: list of all the [`Junction`](@ref)s
+- `streets::S`: list of all the [`Street`](@ref)s
+- `sid_matrix::M`: a table that shows the indices of streets
+]
+"""
 Base.@kwdef struct RoutingProblem{J,S,M}
     n_junctions::Int
     n_cars::Int

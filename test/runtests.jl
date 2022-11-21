@@ -21,6 +21,13 @@ using Test
         @test sort(n₁) == sort(n₂)
     end
 
+    @testset "Empty solution" begin
+        problem = load_problem()
+        s = NoahYixiaoHashCode.empty_solution(problem)
+        @test NoahYixiaoHashCode.is_feasible(s)
+        @test NoahYixiaoHashCode.total_distance(s) == 0
+    end
+
     @testset "Random Walk" begin
         problem = load_problem()
         s = NoahYixiaoHashCode.solve_randwalk(problem)

@@ -1,12 +1,26 @@
+"""
+    Solution
+
+Store a solution to a [`RoutingProblem`](@ref)
+
+# Fields
+- `problem::RoutingProblem`: the problem to solve
+- `routes`: list of junctions that each car visits
+"""
 struct Solution{R}
     problem::RoutingProblem
     routes::R
 end
 
-function route(car_id, s::Solution)
+@inline function route(car_id, s::Solution)
     return s.routes[car_id]
 end
 
+"""
+    empty_solution(p::RoutingProblem)
+
+Return an empty solutoin, in which no car moves.
+"""
 function empty_solution(p::RoutingProblem)
     s = Solution(p, collect([p.init_j] for _ in 1:p.n_cars))
     return s
@@ -24,11 +38,21 @@ function save_text(solution::Solution; io=stdout)
     end
 end
 
+"""
+    is_feasible(solution::Solution)
+
+Return whether a [`Solution`](@ref) is feasible.
+"""
 function is_feasible(solution::Solution)
     problem = solution.problem
     for car in problem.n_cars
         juncs = route(car, solution)
         total_time_cost = 0
+        for junc in juncs
+            if junc < 1 || junc > problem.n_junctions
+                return false
+            end
+        end
         for i in 1:(length(juncs) - 1)
             junc_begin = juncs[i]
             junc_end = juncs[i + 1]
@@ -44,6 +68,11 @@ function is_feasible(solution::Solution)
     return true
 end
 
+"""
+    total_distance(solution::Solution; check=true)
+
+Return the total distance achieved by a solution.
+"""
 function total_distance(solution::Solution; check=true)
     if check
         if !is_feasible(solution)
