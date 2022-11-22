@@ -84,7 +84,7 @@ function total_distance(solution::Solution; check=true)
     visited = fill(false, problem.n_streets)
     total_distance = 0
 
-    for car in problem.n_cars
+    for car in 1:problem.n_cars
         juncs = route(car, solution)
         for i in 1:(length(juncs) - 1)
             junc_begin = juncs[i]
