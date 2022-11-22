@@ -26,6 +26,11 @@ function empty_solution(p::RoutingProblem)
     return s
 end
 
+"""
+    save_text(solution::Solution; io=stdout)
+
+Write the solution in the text format to `io`.
+"""
 function save_text(solution::Solution; io=stdout)
     problem = solution.problem
     println(io, problem.n_cars)
@@ -53,9 +58,9 @@ function is_feasible(solution::Solution)
                 return false
             end
         end
-        for i in 1:(length(juncs) - 1)
+        for i in 1:(length(juncs)-1)
             junc_begin = juncs[i]
-            junc_end = juncs[i + 1]
+            junc_end = juncs[i+1]
             if !has_street(junc_begin, junc_end, problem)
                 return false
             end
@@ -86,9 +91,9 @@ function total_distance(solution::Solution; check=true)
 
     for car in 1:problem.n_cars
         juncs = route(car, solution)
-        for i in 1:(length(juncs) - 1)
+        for i in 1:(length(juncs)-1)
             junc_begin = juncs[i]
-            junc_end = juncs[i + 1]
+            junc_end = juncs[i+1]
             sid = street_id(junc_begin, junc_end, problem)
             if !visited[sid]
                 total_distance += distance(problem.streets[sid])

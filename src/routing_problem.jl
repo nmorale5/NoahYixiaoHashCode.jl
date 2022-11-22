@@ -41,7 +41,12 @@ end
     return p.sid_matrix[j_end, j_begin] != 0
 end
 
-function load_problem(problem_input)
+"""
+    load_problem(problem_input=normpath(joinpath(@__DIR__, "..", "data", "paris_54000.txt")))
+
+Return a [`RoutingProblem`] defined by the input file.
+"""
+function load_problem(problem_input=normpath(joinpath(@__DIR__, "..", "data", "paris_54000.txt")))
     lines = eachline(problem_input)
     n_junctions, n_streets, total_time, n_cars, init_j = map(
         s -> parse(Int, s), split(iterate(lines)[1])
@@ -95,9 +100,4 @@ function load_problem(problem_input)
         streets=streets,
         sid_matrix=sid_matrix
     )
-end
-
-function load_problem()
-    paris_file = normpath(joinpath(@__DIR__, "..", "data", "paris_54000.txt"))
-    return load_problem(paris_file)
 end

@@ -1,18 +1,18 @@
-struct IntRealPair{I<:Integer, R<:Real} <: Number
+struct IntRealPair{I<:Integer,R<:Real} <: Number
     n::I
     f::R
 end
 
 function Base.isless(a::IntRealPair, b::IntRealPair)
-   return a.n < b.n || (a.n == b.n && a.f < b.f)
+    return a.n < b.n || (a.n == b.n && a.f < b.f)
 end
 
 function heuristic_greedy(
-        j₀, j₁, visited::Vector{Int}, problem::RoutingProblem
-    )
+    j₀, j₁, visited::Vector{Int}, problem::RoutingProblem
+)
     sid = street_id(j₀, j₁, problem)
     street = problem.streets[sid]
-    eff =  distance(street) / time_cost(street)
+    eff = distance(street) / time_cost(street)
     if visited[sid] > 0
         return IntRealPair(-visited[sid], rand(typeof(eff)))
     else
@@ -20,6 +20,11 @@ function heuristic_greedy(
     end
 end
 
+"""
+    solve_greedy(problem::RoutingProblem)
+
+Solve a `RoutingProblem` using a greedy algorithm.
+"""
 function solve_greedy(problem::RoutingProblem)
     solution = empty_solution(problem)
     t_free_cars = fill(0, problem.n_cars)
