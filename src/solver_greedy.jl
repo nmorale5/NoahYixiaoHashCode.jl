@@ -7,9 +7,7 @@ function Base.isless(a::IntRealPair, b::IntRealPair)
     return a.n < b.n || (a.n == b.n && a.f < b.f)
 end
 
-function heuristic_greedy(
-    j₀, j₁, visited::Vector{Int}, problem::RoutingProblem
-)
+function heuristic_greedy(j₀, j₁, visited::Vector{Int}, problem::RoutingProblem)
     sid = street_id(j₀, j₁, problem)
     street = problem.streets[sid]
     eff = distance(street) / time_cost(street)
@@ -30,13 +28,13 @@ function solve_greedy(problem::RoutingProblem)
     t_free_cars = fill(0, problem.n_cars)
     nvisited = fill(0, problem.n_streets)
 
-    for t in 0:problem.total_time
-        for car in 1:problem.n_cars
+    for t = 0:problem.total_time
+        for car = 1:problem.n_cars
             if t >= t_free_cars[car]
                 junc_begin = route(car, solution)[end]
                 junc_end = argmax(
                     j -> heuristic_greedy(junc_begin, j, nvisited, problem),
-                    outneighbors(junc_begin, problem)
+                    outneighbors(junc_begin, problem),
                 )
 
                 tᵣ = time_cost(street(junc_begin, junc_end, problem))

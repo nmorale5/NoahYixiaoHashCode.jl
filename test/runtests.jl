@@ -1,7 +1,29 @@
+using Aqua
+using Documenter
 using NoahYixiaoHashCode
+using JuliaFormatter
 using Test
 
+DocMeta.setdocmeta!(
+    NoahYixiaoHashCode,
+    :DocTestSetup,
+    :(using NoahYixiaoHashCode);
+    recursive = true,
+)
+
 @testset verbose = true "NoahYixiaoHashCode.jl" begin
+    @testset verbose = true "Code quality (Aqua.jl)" begin
+        Aqua.test_all(NoahYixiaoHashCode; ambiguities = false)
+    end
+
+    @testset verbose = true "Code formatting (JuliaFormatter.jl)" begin
+        @test format(NoahYixiaoHashCode; verbose = true, overwrite = false)
+    end
+
+    @testset verbose = true "Doctests (Documenter.jl)" begin
+        doctest(NoahYixiaoHashCode)
+    end
+
     @testset "Load file" begin
         problem = load_problem()
         @test problem.n_junctions == 11348

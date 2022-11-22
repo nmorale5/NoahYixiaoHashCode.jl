@@ -7,8 +7,8 @@ function solve_randwalk(problem::RoutingProblem)
     solution = empty_solution(problem)
     t_free_cars = fill(0, problem.n_cars)
 
-    for t in 0:problem.total_time
-        for car in 1:problem.n_cars
+    for t = 0:problem.total_time
+        for car = 1:problem.n_cars
             if t >= t_free_cars[car]
                 junc_begin = route(car, solution)[end]
                 junc_end = rand(outneighbors(junc_begin, problem))
