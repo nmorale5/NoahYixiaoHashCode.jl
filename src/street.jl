@@ -7,7 +7,7 @@ Store the information of a street.
 - `distance::D`: length
 - `time_cost::T`: time cost
 """
-struct Street{D <: Integer,T <: Integer}
+struct Street{D<:Integer,T<:Integer}
     distance::D
     time_cost::T
 end
