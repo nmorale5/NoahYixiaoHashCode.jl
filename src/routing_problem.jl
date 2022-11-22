@@ -12,7 +12,6 @@ Store the information of a routing problem.
 - `junctions::J`: list of all the [`Junction`](@ref)s
 - `streets::S`: list of all the [`Street`](@ref)s
 - `sid_matrix::M`: a table that shows the indices of streets
-]
 """
 Base.@kwdef struct RoutingProblem{J,S,M}
     n_junctions::Int

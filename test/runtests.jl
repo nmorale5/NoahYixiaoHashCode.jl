@@ -12,6 +12,7 @@ using Test
         @test length(problem.junctions) == problem.n_junctions
         @test length(problem.streets) == problem.n_streets
         @test size(problem.sid_matrix) == (problem.n_junctions, problem.n_junctions)
+        @test sum(NoahYixiaoHashCode.distance, problem.streets) == 1967444
     end
 
     @testset "Outneighbors" begin
@@ -41,4 +42,5 @@ using Test
         @test NoahYixiaoHashCode.is_feasible(s)
         @test NoahYixiaoHashCode.total_distance(s) > 1
     end
+
 end
