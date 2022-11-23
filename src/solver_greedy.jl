@@ -11,11 +11,7 @@ function heuristic_greedy(j₀, j₁, visited::Vector{Int}, problem::RoutingProb
     sid = street_id(j₀, j₁, problem)
     street = problem.streets[sid]
     eff = distance(street) / time_cost(street)
-    if visited[sid] > 0
-        return IntRealPair(-visited[sid], rand(typeof(eff)))
-    else
-        return IntRealPair(0, eff)
-    end
+    return IntRealPair(-visited[sid], eff)
 end
 
 """
