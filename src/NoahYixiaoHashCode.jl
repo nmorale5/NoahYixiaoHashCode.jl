@@ -11,6 +11,7 @@ export total_distance
 export load_problem
 export solve_randwalk
 export solve_greedy
+export solve_astar
 export save_text
 
 include("junction.jl")
@@ -19,4 +20,5 @@ include("routing_problem.jl")
 include("solution.jl")
 include("solver_randwalk.jl")
 include("solver_greedy.jl")
+include("solver_astar.jl")
 end
