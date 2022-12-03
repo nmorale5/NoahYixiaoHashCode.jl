@@ -1,17 +1,8 @@
-struct IntRealPair{I<:Integer,R<:Real} <: Number
-    n::I
-    f::R
-end
-
-function Base.isless(a::IntRealPair, b::IntRealPair)
-    return a.n < b.n || (a.n == b.n && a.f < b.f)
-end
-
 function heuristic_greedy(j₀, j₁, visited::Vector{Int}, problem::RoutingProblem)
     sid = street_id(j₀, j₁, problem)
     street = problem.streets[sid]
     eff = distance(street) / time_cost(street)
-    return IntRealPair(-visited[sid], eff)
+    return (-visited[sid], eff)
 end
 
 """
