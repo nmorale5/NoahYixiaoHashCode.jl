@@ -55,7 +55,7 @@ function load_problem(
     init_j += 1
 
     junctions = Vector{Junction{Float64}}(undef, n_junctions)
-    streets = Vector{Street{Int,Int}}(undef, n_streets)
+    streets = Vector{Street{Int,Int,Int,Int}}(undef, n_streets)
     v₁s = Int[]
     v₂s = Int[]
     sids = Int[]
@@ -69,7 +69,7 @@ function load_problem(
         v₁, v₂, d, t, l = map(s -> parse(Int, s), split(iterate(lines)[1]))
         v₁ += 1  # Julia uses 1-based indexing.
         v₂ += 1
-        streets[i] = Street(l, t)
+        streets[i] = Street(l, t, v₁, v₂)
 
         push!(v₂s, v₁)
         push!(v₁s, v₂)

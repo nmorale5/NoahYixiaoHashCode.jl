@@ -6,10 +6,14 @@ Store the information of a street.
 # Fields
 - `distance::D`: length
 - `time_cost::T`: time cost
+- `j₀::A` : index of first junction
+- `j₁::B` : index of second junction
 """
-struct Street{D<:Integer,T<:Integer}
+struct Street{D<:Integer,T<:Integer,A<:Integer,B<:Integer}
     distance::D
     time_cost::T
+    j₀::A
+    j₁::B
 end
 
 """

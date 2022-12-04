@@ -1,25 +1,33 @@
-function make_astar_heuristic(problem::RoutingProblem, visiteds::Vector{Int}, weight::Float64)
-    # choose a random point on the map, get distance to it, and add to 
-    goal = rand(problem.junctions)
+function astar_heuristic_class(problem::RoutingProblem, goals::Vector{Junction{Float64}}, nvisited::Vector{Int64})
+    # something similar to a python class
+    weights = [0., 0., 0.]
+    function randomize_weights!()
+        # attempt to normalize based on calculations in averages.jl
+        weights[1] = rand() * 1.0
+        weights[2] = rand() * 1000.0
+        weights[3] = rand() * 0.1
+    end
+    vis_count(id₀::Int64, id₁::Int64) = nvisited[street_id(id₀, id₁, problem)]
     dist(j₀::Junction, j₁::Junction) = sqrt((j₀.lat - j₁.lat)^2 + (j₀.lon - j₁.lon)^2)
-    diff(j₀::Junction, j₁::Junction) = dist(j₁, goal) - dist(j₀, goal)
-    vis_count(id₀::Int64, id₁::Int64) = visiteds[street_id(id₀, id₁, problem)]
-    function heuristic(id₀::Int64, id₁::Int64)
+    diff(j₀::Junction, j₁::Junction, goal::Junction) = dist(j₁, goal) - dist(j₀, goal)
+    function efficiency(id₀::Int64, id₁::Int64)
+        street = problem.streets[street_id(id₀, id₁, problem)]
+        return -distance(street) / time_cost(street)  # negative since we're finding a minimum
+    end
+    function heuristic(id₀::Int64, id₁::Int64, car::Int64)
         j₀ = problem.junctions[id₀]
         j₁ = problem.junctions[id₁]
-        return weight * diff(j₀, j₁) + vis_count(id₀, id₁)
+        return weights[1] * vis_count(id₀, id₁) + weights[2] * diff(j₀, j₁, goals[car]) + weights[3] * efficiency(id₀, id₁)
     end
-    return heuristic
+    return heuristic, randomize_weights!
 end
 
 
-function one_trial_astar(problem::RoutingProblem, heuristic_weight::Float64=10.)
+function one_trial_astar(problem::RoutingProblem, nvisited::Vector{Int}, heuristic)
     solution = empty_solution(problem)
     t_free_cars = fill(0, problem.n_cars)
-    nvisited = fill(0, problem.n_streets)
+    # nvisited = fill(0, problem.n_streets)
     coverage = 0
-
-    heuristics = [make_astar_heuristic(problem, nvisited, heuristic_weight) for _ in 1:problem.n_cars]
 
     for t = 0:problem.total_time
         for car = 1:problem.n_cars
@@ -27,7 +35,7 @@ function one_trial_astar(problem::RoutingProblem, heuristic_weight::Float64=10.)
 
             junc_begin = route(car, solution)[end]
             junc_end = argmin(
-                j -> heuristics[car](junc_begin, j),
+                j -> heuristic(junc_begin, j, car),
                 outneighbors(junc_begin, problem),
             )
 
@@ -44,7 +52,7 @@ function one_trial_astar(problem::RoutingProblem, heuristic_weight::Float64=10.)
             end
         end
     end
-    return (solution, coverage)
+    return solution, coverage
 end
 
 """
@@ -54,8 +62,19 @@ Solve a `RoutingProblem` by simulating A* heuristic algorithms,
 each with a random weight for distance in the heuristic formula
 """
 function solve_astar(problem::RoutingProblem, trials=10000)
-    return argmax(
-        out -> out[2],
-        [one_trial_astar(problem) for _ in 1:trials]
-    )[1]
+    goals = get_optimal_points(problem)
+    nvisited = fill(0, problem.n_streets)
+    heuristic, randomize_weights! = astar_heuristic_class(problem, goals, nvisited)
+    best_coverage = 0
+    best_solution = nothing
+    for _ in 1:trials
+        fill!(nvisited, 0)
+        randomize_weights!()
+        solution, coverage = one_trial_astar(problem, nvisited, heuristic)
+        if coverage > best_coverage
+            best_coverage = coverage
+            best_solution = solution
+        end
+    end
+    return best_solution
 end
