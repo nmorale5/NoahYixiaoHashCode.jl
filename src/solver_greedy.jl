@@ -1,4 +1,9 @@
-function max_heuristic_junction(j₀, nvisited::Vector{<:Integer}, problem::RoutingProblem, search_depth)
+function max_heuristic_junction(
+    j₀,
+    nvisited::Vector{<:Integer},
+    problem::RoutingProblem,
+    search_depth,
+)
     if search_depth == 0
         return (0, 0, 0), 0
     else
@@ -10,11 +15,11 @@ function max_heuristic_junction(j₀, nvisited::Vector{<:Integer}, problem::Rout
 
             v₀ = nvisited[sid]
             nvisited[sid] += 1
-            h₁, _ = max_heuristic_junction(j₁, nvisited, problem, search_depth-1)
+            h₁, _ = max_heuristic_junction(j₁, nvisited, problem, search_depth - 1)
             nvisited[sid] = v₀
 
             a, b, c = h₁
-            h₀ = (a-nvisited[sid], b+distance(street), c-time_cost(street))
+            h₀ = (a - nvisited[sid], b + distance(street), c - time_cost(street))
 
             if h₀ > h_max
                 h_max = h₀
@@ -30,16 +35,17 @@ end
 
 Solve a `RoutingProblem` using a greedy algorithm.
 """
-function solve_greedy(problem::RoutingProblem; search_depth=10)
+function solve_greedy(problem::RoutingProblem; search_depth = 10)
     solution = empty_solution(problem)
     t_free_cars = fill(0, problem.n_cars)
     nvisited = fill(0, problem.n_streets)
 
     for car = 1:problem.n_cars
-        for t in 0:problem.total_time
+        for t = 0:problem.total_time
             if t >= t_free_cars[car]
                 junc_begin = route(car, solution)[end]
-                _, junc_end = max_heuristic_junction(junc_begin, nvisited, problem, search_depth)
+                _, junc_end =
+                    max_heuristic_junction(junc_begin, nvisited, problem, search_depth)
 
                 tᵣ = time_cost(street(junc_begin, junc_end, problem))
                 t_free = t + tᵣ
