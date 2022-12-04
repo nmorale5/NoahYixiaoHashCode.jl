@@ -4,7 +4,7 @@ function astar_heuristic_class(problem::RoutingProblem, goals::Vector{Junction{F
     function randomize_weights!()
         # attempt to normalize based on calculations in averages.jl
         weights[1] = rand() * 1.0
-        weights[2] = rand() * 1000.0
+        weights[2] = rand() * 10.0
         weights[3] = rand() * 0.1
     end
     vis_count(id₀::Int64, id₁::Int64) = nvisited[street_id(id₀, id₁, problem)]
@@ -19,7 +19,7 @@ function astar_heuristic_class(problem::RoutingProblem, goals::Vector{Junction{F
         j₁ = problem.junctions[id₁]
         return weights[1] * vis_count(id₀, id₁) + weights[2] * diff(j₀, j₁, goals[car]) + weights[3] * efficiency(id₀, id₁)
     end
-    return heuristic, randomize_weights!
+    return heuristic, randomize_weights!, weights
 end
 
 
@@ -64,9 +64,10 @@ each with a random weight for distance in the heuristic formula
 function solve_astar(problem::RoutingProblem, trials=10000)
     goals = get_optimal_points(problem)
     nvisited = fill(0, problem.n_streets)
-    heuristic, randomize_weights! = astar_heuristic_class(problem, goals, nvisited)
+    heuristic, randomize_weights!, weights = astar_heuristic_class(problem, goals, nvisited)
     best_coverage = 0
     best_solution = nothing
+    best_weights = nothing
     for _ in 1:trials
         fill!(nvisited, 0)
         randomize_weights!()
@@ -74,6 +75,8 @@ function solve_astar(problem::RoutingProblem, trials=10000)
         if coverage > best_coverage
             best_coverage = coverage
             best_solution = solution
+            best_weights = copy(weights)
+            println(weights)
         end
     end
     return best_solution
