@@ -1,22 +1,28 @@
-@inline function heuristic_greedy(j₀, j₁, nvisited::Vector{<:Integer}, problem::RoutingProblem, ::Val{search_depth}) where search_depth
-    sid = street_id(j₀, j₁, problem)
-    street = problem.streets[sid]
+function max_heuristic_junction(j₀, nvisited::Vector{<:Integer}, problem::RoutingProblem, search_depth)
     if search_depth == 0
-        a, b, c = (0, 0, 0)
+        return (0, 0, 0), 0
     else
-        v₀ = nvisited[sid]
-        nvisited[sid] += 1
-        h_max = (-problem.n_streets, 0, 0)
-        for j in outneighbors(j₁, problem)
-            h₁ = heuristic_greedy(j₁, j, nvisited, problem, Val(search_depth-1))
-            if h₁ > h_max
-                h_max = h₁
+        h_max = (-typemin(eltype(nvisited)), 0, 0)
+        j₁_max = 0
+        for j₁ in outneighbors(j₀, problem)
+            sid = street_id(j₀, j₁, problem)
+            street = problem.streets[sid]
+
+            v₀ = nvisited[sid]
+            nvisited[sid] += 1
+            h₁, _ = max_heuristic_junction(j₁, nvisited, problem, search_depth-1)
+            nvisited[sid] = v₀
+
+            a, b, c = h₁
+            h₀ = (a-nvisited[sid], b+distance(street), c-time_cost(street))
+
+            if h₀ > h_max
+                h_max = h₀
+                j₁_max = j₁
             end
         end
-        a, b, c = h_max
-        nvisited[sid] = v₀
+        return h_max, j₁_max
     end
-    return (a-nvisited[sid], b+distance(street), c-time_cost(street))
 end
 
 """
@@ -24,7 +30,7 @@ end
 
 Solve a `RoutingProblem` using a greedy algorithm.
 """
-function solve_greedy(problem::RoutingProblem)
+function solve_greedy(problem::RoutingProblem; search_depth=10)
     solution = empty_solution(problem)
     t_free_cars = fill(0, problem.n_cars)
     nvisited = fill(0, problem.n_streets)
@@ -33,10 +39,7 @@ function solve_greedy(problem::RoutingProblem)
         for t in 0:problem.total_time
             if t >= t_free_cars[car]
                 junc_begin = route(car, solution)[end]
-                junc_end = argmax(
-                    j -> heuristic_greedy(junc_begin, j, nvisited, problem, Val(9)),
-                    outneighbors(junc_begin, problem),
-                )
+                _, junc_end = max_heuristic_junction(junc_begin, nvisited, problem, search_depth)
 
                 tᵣ = time_cost(street(junc_begin, junc_end, problem))
                 t_free = t + tᵣ
