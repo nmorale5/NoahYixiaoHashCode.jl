@@ -13,6 +13,9 @@ export load_problem
 export solve_randwalk
 export solve_greedy
 export solve_astar
+export one_trial_astar
+export astar_heuristic_class
+export test_astar
 export get_optimal_points
 export average_efficiency
 export average_distance
@@ -27,4 +30,5 @@ include("solver_greedy.jl")
 include("solver_astar.jl")
 include("kmeans.jl")
 include("averages.jl")
+include("best_random.jl")
 end

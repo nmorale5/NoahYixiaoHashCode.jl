@@ -3,9 +3,9 @@ function astar_heuristic_class(problem::RoutingProblem, goals::Vector{Junction{F
     weights = [0., 0., 0.]
     function randomize_weights!()
         # attempt to normalize based on calculations in averages.jl
-        weights[1] = rand() * 1.0
+        weights[1] = rand() * 2.0
         weights[2] = rand() * 10.0
-        weights[3] = rand() * 0.1
+        weights[3] = rand() * 0.01
     end
     vis_count(id₀::Int64, id₁::Int64) = nvisited[street_id(id₀, id₁, problem)]
     dist(j₀::Junction, j₁::Junction) = sqrt((j₀.lat - j₁.lat)^2 + (j₀.lon - j₁.lon)^2)
@@ -62,13 +62,18 @@ Solve a `RoutingProblem` by simulating A* heuristic algorithms,
 each with a random weight for distance in the heuristic formula
 """
 function solve_astar(problem::RoutingProblem, trials=10000)
-    goals = get_optimal_points(problem)
+    goals = best_goals
     nvisited = fill(0, problem.n_streets)
     heuristic, randomize_weights!, weights = astar_heuristic_class(problem, goals, nvisited)
     best_coverage = 0
     best_solution = nothing
     best_weights = nothing
+    # best_goals = nothing
     for _ in 1:trials
+        # new_goals = get_optimal_points(problem)
+        # for i in 1:8
+        #     goals[i] = new_goals[i]
+        # end
         fill!(nvisited, 0)
         randomize_weights!()
         solution, coverage = one_trial_astar(problem, nvisited, heuristic)
@@ -76,8 +81,24 @@ function solve_astar(problem::RoutingProblem, trials=10000)
             best_coverage = coverage
             best_solution = solution
             best_weights = copy(weights)
-            println(weights)
+            # best_goals = copy(goals)
+            println(weights, coverage)
+            # println(goals)
         end
     end
+    println("done")
+    # println(best_goals)
     return best_solution
+end
+
+function test_astar(problem::RoutingProblem, w)
+    goals = preloaded_goals
+    nvisited = fill(0, problem.n_streets)
+    heuristic, randomize_weights!, weights = astar_heuristic_class(problem, goals, nvisited)
+    weights[1] = w[1]
+    weights[2] = w[2]
+    weights[3] = w[3]
+    solution, coverage = one_trial_astar(problem, nvisited, heuristic)
+    println(coverage, weights)
+    return solution
 end
