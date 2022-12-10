@@ -1,10 +1,27 @@
-@inline function max_heuristic_junction(
+"""
+    max_heuristic_junction(
+        j₀,
+        nvisited::Vector{<:Integer},
+        problem::RoutingProblem,
+        search_depth::Integer,
+    )
+
+Return the maximum heuristic and the corresponding next node.
+
+# Arguments
+    - `j₀`: the starting node
+    - `nvisited`: a vector for how many times each street has been traversed before
+    - `problem`: the [`RoutingProblem`](@ref) to solve
+    - `search_depth`: the number of steps for the look-ahead
+"""
+
+function max_heuristic_junction(
     j₀,
     nvisited::Vector{<:Integer},
     problem::RoutingProblem,
-    ::Val{search_depth},
-) where {search_depth}
-    if search_depth == 0
+    search_depth::Integer,
+)
+    if search_depth <= 0
         return 0, 0
     else
         h_max = -typemin(eltype(nvisited))
@@ -15,7 +32,7 @@
 
             v₀ = nvisited[sid]
             nvisited[sid] += 1
-            h₁, _ = max_heuristic_junction(j₁, nvisited, problem, Val(search_depth - 1))
+            h₁, _ = max_heuristic_junction(j₁, nvisited, problem, search_depth - 1)
             nvisited[sid] = v₀
 
             h₀₁ = nvisited[sid] == 0 ? distance(street) : -nvisited[sid] * time_cost(street)
@@ -31,9 +48,14 @@
 end
 
 """
-    solve_greedy(problem::RoutingProblem)
+    solve_greedy(problem::RoutingProblem; search_depth = 10)
 
-Solve a `RoutingProblem` using a greedy algorithm.
+Solve a [`RoutingProblem`](@ref) using a greedy algorithm.
+
+# Arguments
+    - `problem`: the `RoutingProblem` to solve
+    - `search_depth`: the number of steps for the look-ahead. When it is 1,
+        the code uses a greedy algorithm without a look-ahead.
 """
 function solve_greedy(problem::RoutingProblem; search_depth = 10)
     solution = empty_solution(problem)
@@ -45,7 +67,7 @@ function solve_greedy(problem::RoutingProblem; search_depth = 10)
             if t >= t_free
                 junc_begin = route(car, solution)[end]
                 _, junc_end =
-                    max_heuristic_junction(junc_begin, nvisited, problem, Val(search_depth))
+                    max_heuristic_junction(junc_begin, nvisited, problem, search_depth)
 
                 tᵣ = time_cost(street(junc_begin, junc_end, problem))
                 t_free_next = t + tᵣ

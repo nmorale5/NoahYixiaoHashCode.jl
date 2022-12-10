@@ -11,7 +11,9 @@ Store the information of a routing problem.
 - `init_j::Int`: id of the initial junction
 - `junctions::J`: list of all the [`Junction`](@ref)s
 - `streets::S`: list of all the [`Street`](@ref)s
-- `sid_matrix::M`: a table that shows the indices of streets
+- `sid_matrix::M`: a table that shows the indices of streets. It should be a
+    `SparseArrays.SparseMatrixCSC`, and `sid_matrix[j_end, j_begin]` is the
+    index of the street if it exists otherwise 0.
 """
 Base.@kwdef struct RoutingProblem{J,S,M}
     n_junctions::Int
@@ -44,7 +46,7 @@ end
 """
     load_problem(problem_input=normpath(joinpath(@__DIR__, "..", "data", "paris_54000.txt")))
 
-Return a [`RoutingProblem`] defined by the input file.
+Return a [`RoutingProblem`](@ref) defined by the input file.
 """
 function load_problem(
     problem_input = normpath(joinpath(@__DIR__, "..", "data", "paris_54000.txt")),
