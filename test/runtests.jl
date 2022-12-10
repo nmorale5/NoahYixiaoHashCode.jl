@@ -51,16 +51,9 @@ DocMeta.setdocmeta!(
         @test NoahYixiaoHashCode.total_distance(s) == 0
     end
 
-    @testset "Random Walk" begin
-        problem = load_problem()
-        s = NoahYixiaoHashCode.solve_randwalk(problem)
-        @test NoahYixiaoHashCode.is_feasible(s)
-        @test NoahYixiaoHashCode.total_distance(s) > 1
-    end
-
     @testset "Greedy" begin
         problem = load_problem()
-        s = NoahYixiaoHashCode.solve_greedy(problem)
+        s = NoahYixiaoHashCode.solve_greedy(problem; search_depth = 3)
         @test NoahYixiaoHashCode.is_feasible(s)
         @test NoahYixiaoHashCode.total_distance(s) > 1
     end

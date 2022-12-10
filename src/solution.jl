@@ -7,8 +7,8 @@ Store a solution to a [`RoutingProblem`](@ref)
 - `problem::RoutingProblem`: the problem to solve
 - `routes`: list of junctions that each car visits
 """
-struct Solution{R}
-    problem::RoutingProblem
+struct Solution{P<:RoutingProblem,R}
+    problem::P
     routes::R
 end
 
