@@ -9,10 +9,10 @@
 Return the maximum heuristic and the corresponding next node.
 
 # Arguments
-    - `j₀`: the starting node
-    - `nvisited`: a vector for how many times each street has been traversed before
-    - `problem`: the [`RoutingProblem`](@ref) to solve
-    - `search_depth`: the number of steps for the look-ahead
+- `j₀`: the starting node
+- `nvisited`: a vector for how many times each street has been traversed before
+- `problem`: the [`RoutingProblem`](@ref) to solve
+- `search_depth`: the number of steps for the look-ahead
 """
 
 function max_heuristic_junction(
@@ -53,29 +53,27 @@ end
 Solve a [`RoutingProblem`](@ref) using a greedy algorithm.
 
 # Arguments
-    - `problem`: the `RoutingProblem` to solve
-    - `search_depth`: the number of steps for the look-ahead. When it is 1,
-        the code uses a greedy algorithm without a look-ahead.
+- `problem`: the `RoutingProblem` to solve
+- `search_depth`: the number of steps for the look-ahead. When it is 1,
+    the code uses a greedy algorithm without a look-ahead.
 """
 function solve_greedy(problem::RoutingProblem; search_depth = 10)
     solution = empty_solution(problem)
     nvisited = fill(0, problem.n_streets)
 
     for car = 1:problem.n_cars
-        t_free = 0
-        for t = 0:problem.total_time
-            if t >= t_free
-                junc_begin = route(car, solution)[end]
-                _, junc_end =
-                    max_heuristic_junction(junc_begin, nvisited, problem, search_depth)
+        t = 0
+        while true
+            junc_begin = route(car, solution)[end]
+            _, junc_end =
+                max_heuristic_junction(junc_begin, nvisited, problem, search_depth)
 
-                tᵣ = time_cost(street(junc_begin, junc_end, problem))
-                t_free_next = t + tᵣ
-                if t_free_next <= problem.total_time
-                    t_free = t_free_next
-                    push!(route(car, solution), junc_end)
-                    nvisited[street_id(junc_begin, junc_end, problem)] += 1
-                end
+            t += time_cost(street(junc_begin, junc_end, problem))
+            if t <= problem.total_time
+                push!(route(car, solution), junc_end)
+                nvisited[street_id(junc_begin, junc_end, problem)] += 1
+            else
+                break
             end
         end
     end
