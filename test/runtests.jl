@@ -51,11 +51,31 @@ DocMeta.setdocmeta!(
         @test NoahYixiaoHashCode.total_distance(s) == 0
     end
 
+    @testset "Output" begin
+        f = tempname()
+        open(f, "w") do io
+            problem = load_problem()
+            s = NoahYixiaoHashCode.empty_solution(problem)
+            save_text(s; io = io)
+        end
+
+        empty_output = "8\n" * "1\n4516\n"^8
+        @test empty_output == read(open(f, "r"), String)
+
+        rm(f)
+    end
+
     @testset "Greedy" begin
         problem = load_problem()
         s = NoahYixiaoHashCode.solve_greedy(problem; search_depth = 3)
         @test NoahYixiaoHashCode.is_feasible(s)
         @test NoahYixiaoHashCode.total_distance(s) > 1
     end
+
+    @testset "Upper Bound" begin
+        problem = load_problem()
+        @test total_distance_upper_bound(problem) == 1967444
+    end
+
 
 end

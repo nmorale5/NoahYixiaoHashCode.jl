@@ -81,6 +81,48 @@ of time of the first cat, we start to schedule the route of the second car.
 However, $T_n$ is shared by all the cars. So, the later cars can also learn
 from previous cars.
 
+### Upper Bound Algorithm
+
+To compute our upper bound, we relax one of the rules related to traveling.
+Normally, at any timestep, cars on a graph $G$ can only travel along one of the
+streets adjacent to the junction they're currently at.  Instead, we allow cars
+to travel along any street at any timestep, meaning essentially every junction
+is connected to every other junction with distance 0 and time cost 0 on a
+larger graph $G'$.  By doing this, we skip the need for good routing since the
+street taken no longer affects the possible streets to choose from in the next
+step.
+
+The maximum distance coverable in $G'$ must be at least as much as the maximum
+distance coverable in $G$ (for the same total amount of time), since $G'$
+contains all the edges of $G$ and then some.
+
+To find an upper bound on the maximum distance coverable on $G'$, in at most
+time $T$, we employ the following algorithm $A$:
+
+1. Compute the "efficiency" of each street as its length divided by its time
+   cost, and sort all streets in an array from greatest to least efficiency.
+
+2. Set up running totals for total time and total distance covered,
+   initializing both to 0.
+
+3. While total time has not yet reached $T$, pop the next street from the front
+   of the array (the street with the highest efficiency), and add its time and
+   distance to the running totals.
+
+4. Once the total time has met or exceeded $T$, return the total distance.
+
+The total time cost of algorithm $A$ is at least $T$. Any algorithm $B$ that
+tries to route the cars following the original rules must take at most time
+$T$. This means in order for algorithm $B$ to cover a greater distance, it
+would need an average efficiency greater than that of algorithm $A$. However,
+algorithm $A$ already chooses the maximum possible efficiency, so algorithm $B$
+cannot possibly be better.
+
+In conclusion, the algorithm above is a valid upper bound on the maximum
+possible distance under the original rules. Running the algorithm on the sample
+Paris data with a maximum time of 18,000 yields an upper bound of 1,525,503.
+
+
 ## Index
 
 ```@index
